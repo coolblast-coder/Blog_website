@@ -18,8 +18,9 @@ app.use(express.static("public"));
 const postArray = [];
 
 app.get("/", (req,res)=>{
-  res.render("home", {homeContent: homeStartingContent})
-  console.log(postArray);
+  res.render("home", {homeContent: homeStartingContent,
+    postArray: postArray})
+
 })
 
 app.get("/about", (req,res)=>{
