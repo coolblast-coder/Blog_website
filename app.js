@@ -49,7 +49,6 @@ app.post("/compose", (req, res) => {
     content: req.body.composePost,
     url: _.toLower(_.kebabCase(req.body.composeTitle))
   };
-  console.log(post.url)
   postArray.push(post);
   res.redirect("/");
 });
