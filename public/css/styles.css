@@ -34,10 +34,3 @@
   color: #fff;
 }
 
-.limited{
-   
-        width: 100ch;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-}
