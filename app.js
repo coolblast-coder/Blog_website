@@ -59,7 +59,9 @@ app.get("/posts/:postName", (req, res) => {
       _.toLower(_.kebabCase(req.params.postName)) ===
       _.toLower(_.kebabCase(element.title))
     ) {
-      console.log("Match found");
+      res.render("post", {
+        post: element,
+      });
     }
   });
 });
