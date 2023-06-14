@@ -3,6 +3,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+const mongoose = require('mongoose');
+mongoose.connect("mongodb://127.0.0.1:27017/blogDB");
 
 const homeStartingContent =
   "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
@@ -17,18 +19,34 @@ const app = express();
 // Load the full build.
 const _ = require("lodash");
 
+const postSchema = ({
+  title : String,
+  content : String,
+  url : String
+})
+
+const Post = mongoose.model("Post", postSchema);
+
 app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-const postArray = [];
+// const postArray = [];
 
 app.get("/", (req, res) => {
-  res.render("home", {
-    homeContent: homeStartingContent,
-    postArray: postArray,
-  });
+  // res.render("home", {
+  //   homeContent: homeStartingContent,
+  //   postArray: postArray,
+  // });
+  Post.find({}).then(function(foundItems){
+    res.render("home", {
+      homeContent: homeStartingContent,
+      postArray: foundItems
+    })
+  }).catch(function (err) {
+    console.log(err);
+    })
 });
 
 app.get("/about", (req, res) => {
@@ -41,31 +59,42 @@ app.get("/contact", (req, res) => {
 
 app.get("/compose", (req, res) => {
   res.render("compose");
+    
 });
 
 app.post("/compose", (req, res) => {
-  const post = {
+  // const post = {
+  //   title: req.body.composeTitle,
+  //   content: req.body.composePost,
+  //   url: _.toLower(_.kebabCase(req.body.composeTitle))
+  // };
+  const post = new Post({
     title: req.body.composeTitle,
     content: req.body.composePost,
     url: _.toLower(_.kebabCase(req.body.composeTitle))
-  };
-  postArray.push(post);
+  })
+  // postArray.push(post);
+  post.save();
   res.redirect("/");
 });
 
 app.get("/posts/:postName", (req, res) => {
-  postArray.forEach((element) => {
-    if (
-      _.toLower(_.kebabCase(req.params.postName)) ===
-      _.toLower(_.kebabCase(element.title))
-    ) {
-      res.render("post", {
-        post: element,
-      });
-    }
-  });
+  Post.find({}).then(function (foundItems) { 
+    foundItems.forEach((element) => {
+      if (
+        _.toLower(_.kebabCase(req.params.postName)) ===
+        _.toLower(_.kebabCase(element.title))
+      ) {
+        res.render("post", {
+          post: element,
+        });
+      }
+    });
+   })
+  
+  
 });
 
-app.listen(3000, function () {
+app.listen(4000, function () {
   console.log("Server started on port 3000");
 });
